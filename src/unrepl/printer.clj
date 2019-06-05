@@ -73,19 +73,12 @@
         (print-on write x 0))
 
       (do
-        (when (datafiable? x)
-          (write "#unrepl/browsable ["))
         (when (and *print-meta* (meta x))
           (write "#unrepl/meta [")
           (-print-on (meta x) write rem-depth)
           (write " "))
-        (-print-on x write rem-depth)
+        (-print-on (cond-> x (datafiable? x) browsify) write rem-depth)
         (when (and *print-meta* (meta x))
-          (write "]"))
-        (when (datafiable? x)
-          (write " ")
-          (set! *print-budget* (bump *print-budget* 1))
-          (print-on write (tagged-literal 'unrepl/... (*elide* (lazy-seq [(list (browsify x))]))) (inc rem-depth))
           (write "]"))))))
 
 (defn base64-encode [^java.io.InputStream in]
@@ -358,8 +351,8 @@
                    *print-level* Long/MAX_VALUE
                    *print-budget* Long/MAX_VALUE
                    unrepl/*string-length* Long/MAX_VALUE]
-                   (write (str "#" (:tag x) " "))
-                   (print-on write (:form x) Long/MAX_VALUE))
+                  (write (str "#" (:tag x) " "))
+                  (print-on write (:form x) Long/MAX_VALUE))
       unrepl/browsable (let [[v thunk] (:form x)
                              rem-depth (inc rem-depth)]
                          (set! *print-budget* (bump *print-budget* 2))
