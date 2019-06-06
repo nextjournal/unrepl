@@ -73,12 +73,12 @@
         (print-on write x 0))
 
       (do
-        (when (and *print-meta* (meta x))
+        (when (some? (meta x))
           (write "#unrepl/meta [")
           (-print-on (meta x) write rem-depth)
           (write " "))
         (-print-on (cond-> x (datafiable? x) browsify) write rem-depth)
-        (when (and *print-meta* (meta x))
+        (when (some? (meta x))
           (write "]"))))))
 
 (defn base64-encode [^java.io.InputStream in]
