@@ -63,6 +63,12 @@
       d)))
 ;; end of 1.10
 
+(defn safe-datafiable? [x]
+  (if (or (instance? clojure.lang.Namespace x)
+          (instance? Class x))
+    false
+    (datafiable? x)))
+
 (defn print-on
   [write x rem-depth]
   (let [rem-depth (dec rem-depth)
@@ -77,7 +83,7 @@
           (write "#unrepl/meta [")
           (-print-on (meta x) write rem-depth)
           (write " "))
-        (-print-on (cond-> x (datafiable? x) browsify) write rem-depth)
+        (-print-on (cond-> x (safe-datafiable? x) browsify) write rem-depth)
         (when (some? (meta x))
           (write "]"))))))
 
